@@ -1,0 +1,25 @@
+name: Frisk
+author: broswen
+main: me.broswen.frisk.Frisk
+version: 0.1
+description: This is a custom frisking plugin for the GFLM server.
+softdepend: [Vault]
+
+commands:
+  frisk:
+    description: about the plugin
+    
+permissions:
+  frisk.*:
+    children:
+      frisk.frisk: true
+      frisk.about: true
+  frisk.frisk:
+    description: Allows you to frisk people
+    default: op
+  frisk.about:
+    description: Allows you to /frisk
+    default: op
+  frisk.exempt:
+    description: Player will be exempt from frisking
+    default: false
