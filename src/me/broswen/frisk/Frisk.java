@@ -25,6 +25,7 @@ public class Frisk extends JavaPlugin{
 	public final MyPlayerListener playerListener = new MyPlayerListener();
 	public static Economy econ = null;
 	
+	//when the plugin is enabled
 	@Override
 	public void onEnable(){
 		loadConfiguration();
@@ -36,10 +37,12 @@ public class Frisk extends JavaPlugin{
         }
 	}
 	
+	//when the plugin is disabled
 	@Override
 	public void onDisable(){
 	}
 
+	//setting up the economy with vault
 	private boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
             return false;
@@ -52,26 +55,47 @@ public class Frisk extends JavaPlugin{
         return econ != null;
     }
 	
+	//the main command
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
 		PluginDescriptionFile pdfFile = this.getDescription();
 			
+		//check if the command is /frisk
 		if(cmd.getName().equalsIgnoreCase("frisk")){
+			
+			//check the number of arguments
 			if(args.length == 1){
+				
+				//checks if a player is using the command
 				if(sender instanceof Player){
 					Player player = (Player) sender;
 					
+					//checks if frisking is enabled (not working)
 					if(getConfig().getBoolean("friskenabled") == true){
+						
+						//sets the target player to the first argument
 						Player targetPlayer = player.getServer().getPlayer(args [0]);
+						
+						//checks if the player has permission to frisk
 						if(sender.hasPermission("frisk.frisk")){
+							
+							//checks if the target player is online
 							if(targetPlayer == null){
 								sender.sendMessage(ChatColor.RED + "FRISKING FAILED! That player is not online");
 							}else{
+								
+								//checks if the target player is exempt from being frisked
 								if(targetPlayer.hasPermission("frisk.exempt")){
 									sender.sendMessage(ChatColor.RED + "FRISKING FAILED: That player may not be frisked!");
 								}else{
+									
+									//checks if the target player is the command sender
 									if(targetPlayer != sender){
 										Player senderSender = (Player)sender;
+										
+										//checks if the target player is within 10 blocks
 										if (senderSender.getLocation().distance(targetPlayer.getLocation()) <= 10) {
+											
+											//checks if the target player has the items
 											if(hasItem(targetPlayer, Material.INK_SACK, (short) 3) || hasItem(targetPlayer, Material.INK_SACK, (short) 2) || targetPlayer.getInventory().contains(Material.PUMPKIN_SEEDS) || targetPlayer.getInventory().contains(Material.MELON_SEEDS) || targetPlayer.getInventory().contains(Material.WHEAT) || targetPlayer.getInventory().contains(Material.SUGAR) || targetPlayer.getInventory().contains(Material.NETHER_STALK)){
 												targetPlayer.teleport(new Location(Bukkit.getWorld("world"), -569, 75, -702));
 												sender.sendMessage(ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + " had drugs! You have recieved" + ChatColor.GREEN + " $1000!");
@@ -108,9 +132,10 @@ public class Frisk extends JavaPlugin{
 				}else{
 					getLogger().info("You must be a player to use that command!");
 				}
+				
+			//checks the amount of arguments
 			}else if(args.length > 1){
-				String friskoneonly = ChatColor.translateAlternateColorCodes('&', this.getConfig().getString("friskoneonly"));
-				sender.sendMessage(friskoneonly);
+				sender.sendMessage(ChatColor.RED + "FRISKING FAILED! You may only frisk on player at a time!");
 			}else{
 				if(sender.hasPermission("frisk.about")){
 					if(sender instanceof Player){
@@ -138,6 +163,7 @@ public class Frisk extends JavaPlugin{
 		return false;
 	}
 	
+	//check is the player has an item
 	public boolean hasItem(Player p, Material m, short s){
 	    Inventory inv = p.getInventory();
 	    for(ItemStack item : inv){
@@ -151,6 +177,7 @@ public class Frisk extends JavaPlugin{
 	    return false;
 	}
 	
+	//loading the config
 	public void loadConfiguration(){
 		getConfig().options().copyDefaults(true);
 		saveConfig();
