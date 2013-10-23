@@ -97,19 +97,39 @@ public class Frisk extends JavaPlugin{
 											
 											//checks if the target player has the items
 											if(hasItem(targetPlayer, Material.INK_SACK, (short) 3) || hasItem(targetPlayer, Material.INK_SACK, (short) 2) || targetPlayer.getInventory().contains(Material.PUMPKIN_SEEDS) || targetPlayer.getInventory().contains(Material.MELON_SEEDS) || targetPlayer.getInventory().contains(Material.WHEAT) || targetPlayer.getInventory().contains(Material.SUGAR) || targetPlayer.getInventory().contains(Material.NETHER_STALK)){
-												targetPlayer.teleport(new Location(Bukkit.getWorld("prison"), -58, 66, 82));
-												sender.sendMessage(ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + " had drugs! You have recieved" + ChatColor.GREEN + " $1000!");
-												EconomyResponse r = econ.depositPlayer(sender.getName(), 1000.0);
-												targetPlayer.sendMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " caught you with drugs!");
-												Bukkit.broadcastMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " caught " + ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + " with drugs! he/she was sent to jail!");
-												Bukkit.broadcastMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " recieved $1000 for jailing " + ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + "!");
+												if(targetPlayer.isInsideVehicle()){
+													targetPlayer.leaveVehicle();
+													targetPlayer.teleport(new Location(Bukkit.getWorld("prison"), -58, 66, 82));
+													sender.sendMessage(ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + " had drugs! You have recieved" + ChatColor.GREEN + " $1000!");
+													EconomyResponse r = econ.depositPlayer(sender.getName(), 1000.0);
+													targetPlayer.sendMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " caught you with drugs!");
+													Bukkit.broadcastMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " caught " + ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + " with drugs! he/she was sent to jail!");
+													Bukkit.broadcastMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " recieved $1000 for jailing " + ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + "!");
+												}else{
+													targetPlayer.teleport(new Location(Bukkit.getWorld("prison"), -58, 66, 82));
+													sender.sendMessage(ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + " had drugs! You have recieved" + ChatColor.GREEN + " $1000!");
+													EconomyResponse r = econ.depositPlayer(sender.getName(), 1000.0);
+													targetPlayer.sendMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " caught you with drugs!");
+													Bukkit.broadcastMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " caught " + ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + " with drugs! he/she was sent to jail!");
+													Bukkit.broadcastMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " recieved $1000 for jailing " + ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + "!");
+												}
 											}else if(targetPlayer.getInventory().contains(Material.PUMPKIN) || targetPlayer.getInventory().contains(Material.SUGAR_CANE)){
-												targetPlayer.teleport(new Location(Bukkit.getWorld("prison"), -58, 66, 82));
-												sender.sendMessage(ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + "That player had paraphernalia! You have recieved" + ChatColor.GREEN + " $500!");
-												EconomyResponse r = econ.depositPlayer(sender.getName(), 500.0);
-												targetPlayer.sendMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " caught you with paraphernalia!");
-												Bukkit.broadcastMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " caught " + ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + " with paraphernalia! he/she was sent to jail!");
-												Bukkit.broadcastMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " recieved" + ChatColor.GREEN + " $500" + ChatColor.WHITE + " for jailing " + ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + "!");
+												if(targetPlayer.isInsideVehicle()){
+													targetPlayer.leaveVehicle();
+													targetPlayer.teleport(new Location(Bukkit.getWorld("prison"), -58, 66, 82));
+													sender.sendMessage(ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + "That player had paraphernalia! You have recieved" + ChatColor.GREEN + " $500!");
+													EconomyResponse r = econ.depositPlayer(sender.getName(), 500.0);
+													targetPlayer.sendMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " caught you with paraphernalia!");
+													Bukkit.broadcastMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " caught " + ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + " with paraphernalia! he/she was sent to jail!");
+													Bukkit.broadcastMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " recieved" + ChatColor.GREEN + " $500" + ChatColor.WHITE + " for jailing " + ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + "!");
+												}else{
+													targetPlayer.teleport(new Location(Bukkit.getWorld("prison"), -58, 66, 82));
+													sender.sendMessage(ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + "That player had paraphernalia! You have recieved" + ChatColor.GREEN + " $500!");
+													EconomyResponse r = econ.depositPlayer(sender.getName(), 500.0);
+													targetPlayer.sendMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " caught you with paraphernalia!");
+													Bukkit.broadcastMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " caught " + ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + " with paraphernalia! he/she was sent to jail!");
+													Bukkit.broadcastMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " recieved" + ChatColor.GREEN + " $500" + ChatColor.WHITE + " for jailing " + ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + "!");
+												}
 											}else{
 												sender.sendMessage(ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + " doesn't have anything! Stop frisking innocent people!");
 												player.addPotionEffect(new PotionEffect(PotionEffectType.HARM, 10, 0));
