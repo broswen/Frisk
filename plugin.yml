@@ -17,6 +17,9 @@ permissions:
   frisk.frisk:
     description: Allows you to frisk people
     default: op
+  frisk.friskstick:
+    description: Allows you to use the frisk stick
+    default: op
   frisk.about:
     description: Allows you to /frisk
     default: op

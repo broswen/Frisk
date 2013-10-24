@@ -1,12 +1,4 @@
-# Frisk plugin config file
-# Made by broswen!
-#
-friskcaughtmessage: You were frisked and caught with drugs! You were sent to Jail!
-friskfoundmessage: That player had drugs on him! Good job!
-frisknotfoundmessage: That player doesn't have anything bad! Stop frisking innocent people!
-friskprefix: (Frisk)
-friskoneonly: You may only frisk one person at a time!
-frisknotenabled: /frisk is not enabled!
-friskenabled: true
-notonline: That player is not online!
-outofrange: That player is out of range!
+jailx: 10
+jaily: 70
+jailz: 10
+jailworld: world
