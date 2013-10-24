@@ -33,7 +33,7 @@ public class MyPlayerListener implements Listener{
         econ = rsp.getProvider();
         return econ != null;
     }
-	
+	/*
 	@EventHandler
 	public void onEntityDamage(EntityDamageByEntityEvent event){
 		Entity entity = event.getEntity();
@@ -109,6 +109,7 @@ public class MyPlayerListener implements Listener{
 			}
 		}
 	}
+	*/
 	
 	
 	public boolean hasItem(Player p, Material m, short s){
