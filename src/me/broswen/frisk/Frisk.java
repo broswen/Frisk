@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -37,6 +38,13 @@ public class Frisk extends JavaPlugin{
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+		
+		if(getServer().getPluginManager().getPlugin("Essentials") == null){
+			getLogger().severe("Plugin Disabled! Essentials plugin was not found!");
+            getServer().getPluginManager().disablePlugin(this);
+		}
+		
+		this.plugin = this;
 	}
 	
 	//when the plugin is disabled
@@ -102,19 +110,29 @@ public class Frisk extends JavaPlugin{
 													targetPlayer.leaveVehicle();
 												}
 												
-												String jailWorld = getConfig().getString("jailworld");
-												Double jailx = getConfig().getDouble("jailx");
-												Double jaily = getConfig().getDouble("jaily");
-												Double jailz = getConfig().getDouble("jailz");
+												String jailWorld = plugin.getConfig().getString("jailworld");
+												Double jailx = plugin.getConfig().getDouble("jailx");
+												Double jaily = plugin.getConfig().getDouble("jaily");
+												Double jailz = plugin.getConfig().getDouble("jailz");
+												int drugaward = plugin.getConfig().getInt("drugaward");
+												
+												String jailname = plugin.getConfig().getString("jailname");
+												String jailtimeseconds = plugin.getConfig().getString("jailtimeseconds");
+												Boolean usejailplugin = plugin.getConfig().getBoolean("usejailplugin");
 												
 												Location jailLocation = new Location(Bukkit.getWorld(jailWorld), jailx, jaily, jailz);
 												
-												targetPlayer.teleport(jailLocation);
-												sender.sendMessage(ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + " had drugs! You have recieved" + ChatColor.GREEN + " $1000!");
-												EconomyResponse r = econ.depositPlayer(sender.getName(), 1000.0);
-												targetPlayer.sendMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " caught you with drugs!");
-												Bukkit.broadcastMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " caught " + ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + " with drugs! he/she was sent to jail!");
-												Bukkit.broadcastMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " recieved $1000 for jailing " + ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + "!");
+												if(usejailplugin){
+													getServer().dispatchCommand(getServer().getConsoleSender(), "jail " + targetPlayer.getName() + " " + jailname + " " + jailtimeseconds + "s");
+												}else{
+													targetPlayer.teleport(jailLocation);
+												}
+												
+												player.sendMessage(ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + " had drugs! You have recieved" + ChatColor.GREEN + " $" + drugaward + "!");
+												EconomyResponse r = econ.depositPlayer(player.getName(), drugaward);
+												((CommandSender) targetPlayer).sendMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " caught you with drugs!");
+												Bukkit.broadcastMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " caught " + ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + " with drugs! he/she was sent to jail!");
+												Bukkit.broadcastMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " recieved $" + drugaward + " for jailing " + ChatColor.RED + ((Economy) targetPlayer).getName() + ChatColor.WHITE + "!");
 												
 											}else if(targetPlayer.getInventory().contains(Material.PUMPKIN) || targetPlayer.getInventory().contains(Material.SUGAR_CANE)){
 												
@@ -123,19 +141,29 @@ public class Frisk extends JavaPlugin{
 													targetPlayer.leaveVehicle();
 												}
 												
-												String jailWorld = getConfig().getString("jailworld");
-												Double jailx = getConfig().getDouble("jailx");
-												Double jaily = getConfig().getDouble("jaily");
-												Double jailz = getConfig().getDouble("jailz");
+												String jailWorld = plugin.getConfig().getString("jailworld");
+												Double jailx = plugin.getConfig().getDouble("jailx");
+												Double jaily = plugin.getConfig().getDouble("jaily");
+												Double jailz = plugin.getConfig().getDouble("jailz");
+												int drugrelatedaward = plugin.getConfig().getInt("drugrelatedaward");
+												
+												String jailname = plugin.getConfig().getString("jailname");
+												String jailtimeseconds = plugin.getConfig().getString("jailtimeseconds");
+												Boolean usejailplugin = plugin.getConfig().getBoolean("usejailplugin");
 												
 												Location jailLocation = new Location(Bukkit.getWorld(jailWorld), jailx, jaily, jailz);
 												
-												targetPlayer.teleport(jailLocation);
-												sender.sendMessage(ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + "That player had paraphernalia! You have recieved" + ChatColor.GREEN + " $500!");
-												EconomyResponse r = econ.depositPlayer(sender.getName(), 500.0);
-												targetPlayer.sendMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " caught you with paraphernalia!");
-												Bukkit.broadcastMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " caught " + ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + " with paraphernalia! he/she was sent to jail!");
-												Bukkit.broadcastMessage(ChatColor.BLUE + sender.getName() + ChatColor.WHITE + " recieved" + ChatColor.GREEN + " $500" + ChatColor.WHITE + " for jailing " + ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + "!");
+												if(usejailplugin){
+													getServer().dispatchCommand(getServer().getConsoleSender(), "jail " + targetPlayer.getName() + " " + jailname + " " + jailtimeseconds + "s");
+												}else{
+													targetPlayer.teleport(jailLocation);
+												}
+												
+												player.sendMessage(ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + "That player had paraphernalia! You have recieved" + ChatColor.GREEN + " $" + drugrelatedaward + "!");
+												EconomyResponse r = econ.depositPlayer(player.getName(), drugrelatedaward);
+												((CommandSender) targetPlayer).sendMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " caught you with paraphernalia!");
+												Bukkit.broadcastMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " caught " + ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + " with paraphernalia! he/she was sent to jail!");
+												Bukkit.broadcastMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " recieved" + ChatColor.GREEN + " $" + drugrelatedaward + ChatColor.WHITE + " for jailing " + ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + "!");
 											
 											}else{
 												sender.sendMessage(ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + " doesn't have anything! Stop frisking innocent people!");
@@ -200,18 +228,32 @@ public class Frisk extends JavaPlugin{
 	    }
 	    return false;
 	}
+	
+	public Economy getEconomy(Economy econ) {
+        return econ;
+    }
 
 	public void loadConfig(){
 		saveDefaultConfig();
 		
+		String drugrelatedaward = "drugrelatedaward";
+		String drugaward = "drugaward";
 		String jailx = "jailx";
 		String jaily = "jaily";
 		String jailz = "jailz";
 		String jailworld = "jailworld";
+		String jailname = "jailname";
+		String jailtimeseconds = "jailtimeseconds";
+		String usejailplugin = "usejailplugin";
 		
 		getConfig().options().copyDefaults(true);
 		saveConfig();
 		
+		getConfig().addDefault(usejailplugin, "false");
+		getConfig().addDefault(jailtimeseconds, "120");
+		getConfig().addDefault(jailname, "jail");
+		getConfig().addDefault(drugrelatedaward, "500");
+		getConfig().addDefault(drugaward, "1000");
 		getConfig().addDefault(jailx, "10");
 		getConfig().addDefault(jaily, "70");
 		getConfig().addDefault(jailz, "10");

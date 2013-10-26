@@ -1,4 +1,9 @@
+drugrelatedaward: 500
+drugaward: 1000
 jailx: 10
 jaily: 70
 jailz: 10
 jailworld: world
+jailname: jail
+jailtimeseconds: 120
+usejailplugin: false
