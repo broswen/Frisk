@@ -8,12 +8,15 @@ softdepend: [Vault]
 commands:
   frisk:
     description: about the plugin
+  friskstick:
+    description: gives you a frisk stick
     
 permissions:
   frisk.*:
     children:
       frisk.frisk: true
       frisk.about: true
+      frisk.friskstick: true
   frisk.frisk:
     description: Allows you to frisk people
     default: op
@@ -26,3 +29,6 @@ permissions:
   frisk.exempt:
     description: Player will be exempt from frisking
     default: false
+  frisk.friskstick.command:
+    description: allows /friskstick
+    default: op

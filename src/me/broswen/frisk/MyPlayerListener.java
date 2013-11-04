@@ -25,7 +25,6 @@ public class MyPlayerListener implements Listener{
 	public static Frisk plugin;
 	public static Economy econ = null;
 	
-	
 	@EventHandler
 	public void onPlayerInteractEntity(PlayerInteractEntityEvent event){
 		Entity targetPlayer = event.getRightClicked();
@@ -36,6 +35,9 @@ public class MyPlayerListener implements Listener{
 		ItemMeta friskStickMeta = friskStick.getItemMeta();
 		friskStickMeta.setDisplayName(ChatColor.RESET.AQUA + "Frisk Stick");
 		friskStick.setItemMeta(friskStickMeta);
+		
+		int i = 0;
+		for(i = 0; i < 64; i++, friskStick.setAmount(friskStick.getAmount() + 1)){
 			
 			if(player.getItemInHand().equals(friskStick)){
 				
@@ -46,7 +48,8 @@ public class MyPlayerListener implements Listener{
 						Bukkit.dispatchCommand(player, "frisk " + targetPlayerName);
 					}
 				}
-				
 			}
+			
 		}
 	}
+}

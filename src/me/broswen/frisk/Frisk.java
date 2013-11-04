@@ -15,6 +15,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -132,7 +133,7 @@ public class Frisk extends JavaPlugin{
 												EconomyResponse r = econ.depositPlayer(player.getName(), drugaward);
 												((CommandSender) targetPlayer).sendMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " caught you with drugs!");
 												Bukkit.broadcastMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " caught " + ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + " with drugs! he/she was sent to jail!");
-												Bukkit.broadcastMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " recieved $" + drugaward + " for jailing " + ChatColor.RED + ((Economy) targetPlayer).getName() + ChatColor.WHITE + "!");
+												Bukkit.broadcastMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " recieved $" + drugaward + " for jailing " + ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + "!");
 												
 											}else if(targetPlayer.getInventory().contains(Material.PUMPKIN) || targetPlayer.getInventory().contains(Material.SUGAR_CANE)){
 												
@@ -159,7 +160,7 @@ public class Frisk extends JavaPlugin{
 													targetPlayer.teleport(jailLocation);
 												}
 												
-												player.sendMessage(ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + "That player had paraphernalia! You have recieved" + ChatColor.GREEN + " $" + drugrelatedaward + "!");
+												player.sendMessage(ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + " had paraphernalia! You have recieved" + ChatColor.GREEN + " $" + drugrelatedaward + "!");
 												EconomyResponse r = econ.depositPlayer(player.getName(), drugrelatedaward);
 												((CommandSender) targetPlayer).sendMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " caught you with paraphernalia!");
 												Bukkit.broadcastMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " caught " + ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + " with paraphernalia! he/she was sent to jail!");
@@ -210,6 +211,27 @@ public class Frisk extends JavaPlugin{
 				}else{
 					sender.sendMessage(ChatColor.GRAY + "You don't have permission!");
 				}
+			}
+		}
+		
+		if(cmd.getName().equalsIgnoreCase("friskstick")){
+			
+			if(sender.hasPermission("frisk.friskstick.command")){
+				
+				if(sender instanceof Player){
+					Player player = (Player) sender;
+					
+					ItemStack friskStick = new ItemStack(Material.STICK);
+					ItemMeta friskStickMeta = friskStick.getItemMeta();
+					friskStickMeta.setDisplayName(ChatColor.RESET.AQUA + "Frisk Stick");
+					friskStick.setItemMeta(friskStickMeta);
+					
+					player.getInventory().addItem(friskStick);
+				}else{
+					getLogger().info("You must be a player!");
+				}
+			}else{
+				sender.sendMessage(ChatColor.GRAY + "You don't have permission!");
 			}
 		}
 		return false;
