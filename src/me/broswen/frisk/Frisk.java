@@ -1,5 +1,10 @@
 package me.broswen.frisk;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 
@@ -129,6 +134,8 @@ public class Frisk extends JavaPlugin{
 													targetPlayer.teleport(jailLocation);
 												}
 												
+												logToFile(player.getName() + " frisked and caught " + targetPlayer.getName() + " with drugs");
+												
 												player.sendMessage(ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + " had drugs! You have recieved" + ChatColor.GREEN + " $" + drugaward + "!");
 												EconomyResponse r = econ.depositPlayer(player.getName(), drugaward);
 												((CommandSender) targetPlayer).sendMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " caught you with drugs!");
@@ -159,6 +166,8 @@ public class Frisk extends JavaPlugin{
 												}else{
 													targetPlayer.teleport(jailLocation);
 												}
+												
+												logToFile(player.getName() + " frisked and caught " + targetPlayer.getName() + " with paraphernalia");
 												
 												player.sendMessage(ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + " had paraphernalia! You have recieved" + ChatColor.GREEN + " $" + drugrelatedaward + "!");
 												EconomyResponse r = econ.depositPlayer(player.getName(), drugrelatedaward);
@@ -226,6 +235,8 @@ public class Frisk extends JavaPlugin{
 					friskStickMeta.setDisplayName(ChatColor.RESET.AQUA + "Frisk Stick");
 					friskStick.setItemMeta(friskStickMeta);
 					
+					player.sendMessage((ChatColor.RED + "FRISK: " + ChatColor.WHITE + "You recieved a Frisk Stick!"));
+					
 					player.getInventory().addItem(friskStick);
 				}else{
 					getLogger().info("You must be a player!");
@@ -234,6 +245,14 @@ public class Frisk extends JavaPlugin{
 				sender.sendMessage(ChatColor.GRAY + "You don't have permission!");
 			}
 		}
+		
+		if(cmd.getName().equalsIgnoreCase("friskreload")){
+			if(sender.hasPermission("frisk.reload")){
+				reloadConfig();
+				sender.sendMessage((ChatColor.RED + "FRISK: " + ChatColor.WHITE + "The config file was reloaded!"));
+			}
+		}
+		
 		return false;
 	}
 	
@@ -280,6 +299,30 @@ public class Frisk extends JavaPlugin{
 		getConfig().addDefault(jaily, "70");
 		getConfig().addDefault(jailz, "10");
 		getConfig().addDefault(jailworld, "world");
+	}
+	
+	public void logToFile(String message){
+		
+		try{
+			File dataFolder = getDataFolder();
+			if(!dataFolder.exists()){
+				dataFolder.mkdir();
+			}
+			
+			File saveTo = new File(getDataFolder(), "log.txt");
+			if(!saveTo.exists()){
+				saveTo.createNewFile();
+			}
+			
+			FileWriter fw = new FileWriter(saveTo, true);
+			PrintWriter pw = new PrintWriter(fw);
+			
+			pw.println(message);
+			pw.flush();
+			pw.close();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
 	}
 	
 }

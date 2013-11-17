@@ -10,6 +10,8 @@ commands:
     description: about the plugin
   friskstick:
     description: gives you a frisk stick
+  friskreload:
+    description: reloads the config file
     
 permissions:
   frisk.*:
@@ -31,4 +33,7 @@ permissions:
     default: false
   frisk.friskstick.command:
     description: allows /friskstick
+    default: op
+  frisk.reload:
+    description: allows /friskreload
     default: op
