@@ -4,16 +4,15 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.HumanEntity;
@@ -21,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.Dye;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,9 +30,13 @@ import org.bukkit.potion.PotionEffectType;
 public class Frisk extends JavaPlugin{
 	public static Frisk plugin;
 	public final MyPlayerListener playerListener = new MyPlayerListener();
+	
+	public static HashMap<String, Long> hashmap = new HashMap<String, Long>();
 	public static Economy econ = null;
 	
-	//when the plugin is enabled
+	Boolean hasDrug = false;
+	Boolean hasPara = false;
+	
 	@Override
 	public void onEnable(){
 		getServer().getPluginManager().registerEvents(this.playerListener, this);
@@ -53,12 +57,10 @@ public class Frisk extends JavaPlugin{
 		this.plugin = this;
 	}
 	
-	//when the plugin is disabled
 	@Override
 	public void onDisable(){
 	}
 
-	//setting up the economy with vault
 	private boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
             return false;
@@ -71,7 +73,6 @@ public class Frisk extends JavaPlugin{
         return econ != null;
     }
 	
-	//the main command
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
 		PluginDescriptionFile pdfFile = this.getDescription();
 			
@@ -83,108 +84,40 @@ public class Frisk extends JavaPlugin{
 				
 				//checks if a player is using the command
 				if(sender instanceof Player){
-					Player player = (Player) sender;
+					final Player player = (Player) sender;
 						
 						//sets the target player to the first argument
 						Player targetPlayer = player.getServer().getPlayer(args [0]);
 						
 						//checks if the player has permission to frisk
-						if(sender.hasPermission("frisk.frisk")){
+						if(player.hasPermission("frisk.frisk")){
 							
 							//checks if the target player is online
 							if(targetPlayer == null){
 								sender.sendMessage(ChatColor.RED + "FRISKING FAILED! That player is not online");
 							}else{
 								
+								int cooldownTime = plugin.getConfig().getInt("cooldowntime");
+								int cooldownTicks = cooldownTime * 20;
+								
 								//checks if the target player is exempt from being frisked
 								if(targetPlayer.hasPermission("frisk.exempt")){
 									sender.sendMessage(ChatColor.RED + "FRISKING FAILED: That player may not be frisked!");
 								}else{
 									
-									//checks if the target player is the command sender
-									if(targetPlayer != sender){
-										Player senderSender = (Player)sender;
-										
-										//checks if the target player is within 10 blocks
-										if (senderSender.getLocation().distance(targetPlayer.getLocation()) <= 10) {
-											
-											//checks if the target player has the items
-											if(hasItem(targetPlayer, Material.INK_SACK, (short) 3) || hasItem(targetPlayer, Material.INK_SACK, (short) 2) || targetPlayer.getInventory().contains(Material.PUMPKIN_SEEDS) || targetPlayer.getInventory().contains(Material.MELON_SEEDS) || targetPlayer.getInventory().contains(Material.WHEAT) || targetPlayer.getInventory().contains(Material.SUGAR) || targetPlayer.getInventory().contains(Material.NETHER_STALK)){
-												
-												//checks if the targetplayer is in a vehicle
-												if(targetPlayer.isInsideVehicle()){
-													targetPlayer.leaveVehicle();
-												}
-												
-												String jailWorld = plugin.getConfig().getString("jailworld");
-												Double jailx = plugin.getConfig().getDouble("jailx");
-												Double jaily = plugin.getConfig().getDouble("jaily");
-												Double jailz = plugin.getConfig().getDouble("jailz");
-												int drugaward = plugin.getConfig().getInt("drugaward");
-												
-												String jailname = plugin.getConfig().getString("jailname");
-												String jailtimeseconds = plugin.getConfig().getString("jailtimeseconds");
-												Boolean usejailplugin = plugin.getConfig().getBoolean("usejailplugin");
-												
-												Location jailLocation = new Location(Bukkit.getWorld(jailWorld), jailx, jaily, jailz);
-												
-												if(usejailplugin){
-													getServer().dispatchCommand(getServer().getConsoleSender(), "jail " + targetPlayer.getName() + " " + jailname + " " + jailtimeseconds + "s");
-												}else{
-													targetPlayer.teleport(jailLocation);
-												}
-												
-												logToFile(player.getName() + " frisked and caught " + targetPlayer.getName() + " with drugs");
-												
-												player.sendMessage(ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + " had drugs! You have recieved" + ChatColor.GREEN + " $" + drugaward + "!");
-												EconomyResponse r = econ.depositPlayer(player.getName(), drugaward);
-												((CommandSender) targetPlayer).sendMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " caught you with drugs!");
-												Bukkit.broadcastMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " caught " + ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + " with drugs! he/she was sent to jail!");
-												Bukkit.broadcastMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " recieved $" + drugaward + " for jailing " + ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + "!");
-												
-											}else if(targetPlayer.getInventory().contains(Material.PUMPKIN) || targetPlayer.getInventory().contains(Material.SUGAR_CANE)){
-												
-												//checks if the targetplayer is in a vehicle
-												if(targetPlayer.isInsideVehicle()){
-													targetPlayer.leaveVehicle();
-												}
-												
-												String jailWorld = plugin.getConfig().getString("jailworld");
-												Double jailx = plugin.getConfig().getDouble("jailx");
-												Double jaily = plugin.getConfig().getDouble("jaily");
-												Double jailz = plugin.getConfig().getDouble("jailz");
-												int drugrelatedaward = plugin.getConfig().getInt("drugrelatedaward");
-												
-												String jailname = plugin.getConfig().getString("jailname");
-												String jailtimeseconds = plugin.getConfig().getString("jailtimeseconds");
-												Boolean usejailplugin = plugin.getConfig().getBoolean("usejailplugin");
-												
-												Location jailLocation = new Location(Bukkit.getWorld(jailWorld), jailx, jaily, jailz);
-												
-												if(usejailplugin){
-													getServer().dispatchCommand(getServer().getConsoleSender(), "jail " + targetPlayer.getName() + " " + jailname + " " + jailtimeseconds + "s");
-												}else{
-													targetPlayer.teleport(jailLocation);
-												}
-												
-												logToFile(player.getName() + " frisked and caught " + targetPlayer.getName() + " with paraphernalia");
-												
-												player.sendMessage(ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + " had paraphernalia! You have recieved" + ChatColor.GREEN + " $" + drugrelatedaward + "!");
-												EconomyResponse r = econ.depositPlayer(player.getName(), drugrelatedaward);
-												((CommandSender) targetPlayer).sendMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " caught you with paraphernalia!");
-												Bukkit.broadcastMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " caught " + ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + " with paraphernalia! he/she was sent to jail!");
-												Bukkit.broadcastMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " recieved" + ChatColor.GREEN + " $" + drugrelatedaward + ChatColor.WHITE + " for jailing " + ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + "!");
-											
-											}else{
-												sender.sendMessage(ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + " doesn't have anything! Stop frisking innocent people!");
-												player.addPotionEffect(new PotionEffect(PotionEffectType.HARM, 10, 0));
-												player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 200, 1));
+									if(!hashmap.containsKey(player.getName())){
+										hashmap.put(player.getName(), null);
+										friskCommand((Player) targetPlayer, (Player) player, (Player) sender);
+										plugin.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable(){
+
+											@Override
+											public void run() {
+												hashmap.remove(player.getName());
 											}
-										}else{
-											sender.sendMessage(ChatColor.RED + "FRISKING FAILED! That player is out of range");
-										}
+											
+										}, cooldownTicks);
 									}else{
-										sender.sendMessage(ChatColor.RED + "FRISKING FAILED! You may not frisk yourself");
+										sender.sendMessage(ChatColor.RED + "FRISKING FAILED: You must wait " + cooldownTime + " seconds between each frisk!");
 									}
 								}
 							}
@@ -256,7 +189,6 @@ public class Frisk extends JavaPlugin{
 		return false;
 	}
 	
-	//check is the player has an item
 	public boolean hasItem(Player p, Material m, short s){
 	    Inventory inv = p.getInventory();
 	    for(ItemStack item : inv){
@@ -276,29 +208,8 @@ public class Frisk extends JavaPlugin{
 
 	public void loadConfig(){
 		saveDefaultConfig();
-		
-		String drugrelatedaward = "drugrelatedaward";
-		String drugaward = "drugaward";
-		String jailx = "jailx";
-		String jaily = "jaily";
-		String jailz = "jailz";
-		String jailworld = "jailworld";
-		String jailname = "jailname";
-		String jailtimeseconds = "jailtimeseconds";
-		String usejailplugin = "usejailplugin";
-		
 		getConfig().options().copyDefaults(true);
 		saveConfig();
-		
-		getConfig().addDefault(usejailplugin, "false");
-		getConfig().addDefault(jailtimeseconds, "120");
-		getConfig().addDefault(jailname, "jail");
-		getConfig().addDefault(drugrelatedaward, "500");
-		getConfig().addDefault(drugaward, "1000");
-		getConfig().addDefault(jailx, "10");
-		getConfig().addDefault(jaily, "70");
-		getConfig().addDefault(jailz, "10");
-		getConfig().addDefault(jailworld, "world");
 	}
 	
 	public void logToFile(String message){
@@ -325,4 +236,121 @@ public class Frisk extends JavaPlugin{
 		}
 	}
 	
+	public void friskCommand(Player targetPlayer, Player sender, Player player){
+		Inventory targetPlayerInventory = targetPlayer.getInventory();
+		String jailWorld = plugin.getConfig().getString("jailworld");
+		Double jailx = plugin.getConfig().getDouble("jailx");
+		Double jaily = plugin.getConfig().getDouble("jaily");
+		Double jailz = plugin.getConfig().getDouble("jailz");
+		int drugaward = plugin.getConfig().getInt("drugaward");
+		int drugrelatedaward = plugin.getConfig().getInt("drugrelatedaward");
+		String jailname = plugin.getConfig().getString("jailname");
+		String jailtimeseconds = plugin.getConfig().getString("jailtimeseconds");
+		Boolean usejailplugin = plugin.getConfig().getBoolean("usejailplugin");
+		Location jailLocation = new Location(Bukkit.getWorld(jailWorld), jailx, jaily, jailz);
+		Boolean hasDrug = false;
+		Boolean hasPara = false;
+		
+		if(targetPlayer != player){
+			
+			if (player.getLocation().distance(targetPlayer.getLocation()) <= 10) {
+				
+				if(hasItem(targetPlayer, Material.INK_SACK, (short) 3) || hasItem(targetPlayer, Material.INK_SACK, (short) 2) || targetPlayerInventory.contains(Material.SUGAR) || targetPlayerInventory.contains(Material.PUMPKIN_SEEDS) || targetPlayerInventory.contains(Material.MELON_SEEDS) || targetPlayerInventory.contains(Material.WHEAT) || targetPlayerInventory.contains(Material.NETHER_STALK)){
+					hasDrug = true;
+				}else if(targetPlayerInventory.contains(Material.SUGAR_CANE) || targetPlayerInventory.contains(Material.PUMPKIN)){
+					hasPara = true;
+				}else{
+					hasPara = false;
+					hasDrug = false;
+				}
+				
+				if(hasDrug){
+					logToFile(player.getName() + " frisked and caught " + targetPlayer.getName() + " with drugs");
+					
+					if(targetPlayer.isInsideVehicle()){
+						targetPlayer.leaveVehicle();
+					}
+					
+					broadcastFriskSuccess(player, targetPlayer, hasDrug, hasPara);
+					removeDrugs(targetPlayer,player);
+					
+					if(usejailplugin){
+						getServer().dispatchCommand(getServer().getConsoleSender(), "jail " + targetPlayer.getName() + " " + jailname + " " + jailtimeseconds + "s");
+					}else{
+						targetPlayer.teleport(jailLocation);
+					}
+					
+				}else if(hasPara){
+					logToFile(player.getName() + " frisked and caught " + targetPlayer.getName() + " with paraphernalia");
+					
+					if(targetPlayer.isInsideVehicle()){
+						targetPlayer.leaveVehicle();
+					}
+					
+					broadcastFriskSuccess(player, targetPlayer, hasDrug, hasPara);
+					removeDrugs(targetPlayer,player);
+					
+					if(usejailplugin){
+						getServer().dispatchCommand(getServer().getConsoleSender(), "jail " + targetPlayer.getName() + " " + jailname + " " + jailtimeseconds + "s");
+					}else{
+						targetPlayer.teleport(jailLocation);
+					}
+					
+				}else{
+					player.sendMessage(ChatColor.RED + targetPlayer.getName() + ChatColor.WHITE + " doesn't have anything! Stop frisking innocent people!");
+					player.addPotionEffect(new PotionEffect(PotionEffectType.HARM, 10, 0));
+					player.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 200, 1));
+				}
+			}else{
+				sender.sendMessage(ChatColor.RED + "FRISKING FAILED! That player is out of range");
+			}
+		}else{
+			sender.sendMessage(ChatColor.RED + "FRISKING FAILED! You may not frisk yourself");
+		}
+	}
+	
+	public void broadcastFriskSuccess(Player player, Player targetPlayer, Boolean hasDrug, Boolean hasPara){
+		int drugaward = plugin.getConfig().getInt("drugaward");
+		int drugrelatedaward = plugin.getConfig().getInt("drugrelatedaward");
+		
+		if(hasDrug = true){
+			player.sendMessage(ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + " had drugs! You have recieved" + ChatColor.GREEN + " $" + drugaward + "!");
+			EconomyResponse r = econ.depositPlayer(player.getName(), drugaward);
+			((CommandSender) targetPlayer).sendMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " caught you with drugs!");
+			Bukkit.broadcastMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " caught " + ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + " with drugs! he/she was sent to jail!");
+			Bukkit.broadcastMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " recieved $" + drugaward + " for jailing " + ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + "!");
+		}else if(hasPara = true){
+			player.sendMessage(ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + " had paraphernalia! You have recieved" + ChatColor.GREEN + " $" + drugrelatedaward + "!");
+			EconomyResponse r = econ.depositPlayer(player.getName(), drugrelatedaward);
+			((CommandSender) targetPlayer).sendMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " caught you with paraphernalia!");
+			Bukkit.broadcastMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " caught " + ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + " with paraphernalia! he/she was sent to jail!");
+			Bukkit.broadcastMessage(ChatColor.BLUE + player.getName() + ChatColor.WHITE + " recieved" + ChatColor.GREEN + " $" + drugrelatedaward + ChatColor.WHITE + " for jailing " + ChatColor.RED + ((HumanEntity) targetPlayer).getName() + ChatColor.WHITE + "!");
+		}
+	}
+	
+	public void removeDrugs(Player targetPlayer, Player player){
+		
+		Inventory targetPlayerInventory = targetPlayer.getInventory();
+		int targetPlayerInventorySize = targetPlayerInventory.getSize();
+		
+		for(int i = 0 ; i < targetPlayerInventorySize ; i++) {
+			ItemStack item = targetPlayerInventory.getItem(i);
+			
+			if(item != null){
+			    if(item.getType() == Material.INK_SACK && item.getData().getData() == (short) 3 || item.getType() == Material.INK_SACK && item.getData().getData() == (short) 2 || item.getType() == Material.PUMPKIN_SEEDS || item.getType() == Material.MELON_SEEDS || item.getType() == Material.SUGAR || item.getType() == Material.NETHER_STALK || item.getType() == Material.WHEAT || item.getType() == Material.PUMPKIN || item.getType() == Material.SUGAR_CANE){
+			    	targetPlayer.getInventory().remove(item);
+			    	targetPlayer.updateInventory();
+			    	
+			    	if(player.getInventory().firstEmpty() == -1){
+			    		player.getWorld().dropItemNaturally(player.getLocation(), item);
+			    	}else{
+			    		player.getInventory().addItem(item);
+				    	player.updateInventory();
+			    	}
+			    	
+			    }
+				
+			}
+		}
+	}
 }
